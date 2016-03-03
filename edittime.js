@@ -11,19 +11,6 @@
 		"type":			"object",				// either "world" (appears in layout and is drawn), else "object"
 		"rotatable":		false,					// only used when "type" is "world".  Enables an angle property on the object.
 		"flags":		0						// uncomment lines to enable flags...
-					//	| pf_singleglobal		// exists project-wide, e.g. mouse, keyboard.  "type" must be "object".
-					//	| pf_texture			// object has a single texture (e.g. tiled background)
-					//	| pf_position_aces		// compare/set/get x, y...
-					//	| pf_size_aces			// compare/set/get width, height...
-					//	| pf_angle_aces			// compare/set/get angle (recommended that "rotatable" be set to true)
-					//	| pf_appearance_aces		// compare/set/get visible, opacity...
-					//	| pf_tiling			// adjusts image editor features to better suit tiled images (e.g. tiled background)
-					//	| pf_animations			// enables the animations system.  See 'Sprite' for usage
-					//	| pf_zorder_aces		// move to top, bottom, layer...
-					//  	| pf_nosize			// prevent resizing in the editor
-					//	| pf_effects			// allow WebGL shader effects to be added
-					//  	| pf_predraw			// set for any plugin which draws and is not a sprite (i.e. does not simply draw
-												// a single non-tiling image the size of the object) - required for effects to work properly
 	};
 };
 
@@ -89,7 +76,9 @@ AddAction(0, af_none, "Create resource (POST)", "API Calls", "Create a new {0}",
 //				 description);	// description in expressions panel
 
 // example
-AddExpression(0, ef_return_number, "Resource ID", "API Data", "getResourceID", "Returns the database ID of the resource.");
+AddExpression(0, ef_return_number, "Resource ID", "API Data", "getResourceID", "Returns the database ID of this resource.");
+AddExpression(1, ef_return_string, "Resource Name", "API Data", "getResourceName", "Returns the name of this resource.");
+AddExpression(2, ef_return_string, "Resource JSON", "API Data", "getResourceJSON", "Returns the full JSON response for this resource.");
 
 
 
