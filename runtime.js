@@ -90,6 +90,7 @@ cr.plugins_.AJK_REST = function(runtime)
 		console.log("Create action");
 		// make the ajax call
 		// on response, parse it
+		// i think this is where I define ResourceID, ResourceName, and ResourceJSON
 	};
 	
 	
@@ -101,14 +102,8 @@ cr.plugins_.AJK_REST = function(runtime)
 	// Expressions
 	function Exps() {};
 	
-	Exps.prototype.getResourceID = function (ret)	// 'ret' must always be the first parameter - always return the expression's result through it!
-	{
-		ret.set_int(ResourceID);				// return our value
-		// ret.set_float(0.5);			// for returning floats
-		// ret.set_string("Hello");		// for ef_return_string
-		// ret.set_any("woo");			// for ef_return_any, accepts either a number or string
-	};
-	
+	// 'ret' must always be the first parameter - always return the expression's result through it!
+	Exps.prototype.getResourceID = function (ret)	{ ret.set_int(ResourceID); };
 	Exps.prototype.getResourceName = function (ret)	{ ret.set_string(ResourceName); };
 	Exps.prototype.getResourceJSON = function (ret)	{ ret.set_string(ResourceJSON); };
 	
