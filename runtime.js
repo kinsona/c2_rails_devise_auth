@@ -32,6 +32,8 @@ cr.plugins_.AJK_REST = function(runtime)
 	var restRuntime = null;
 	var restInst = null;
 	var ResourceID = null;
+	var ResourceName = "";
+	var ResourceJSON = "";
 
 	// called on startup for each object type
 	typeProto.onCreate = function()
@@ -106,6 +108,9 @@ cr.plugins_.AJK_REST = function(runtime)
 		// ret.set_string("Hello");		// for ef_return_string
 		// ret.set_any("woo");			// for ef_return_any, accepts either a number or string
 	};
+	
+	Exps.prototype.getResourceName = function (ret)	{ ret.set_string(ResourceName); };
+	Exps.prototype.getResourceJSON = function (ret)	{ ret.set_string(ResourceJSON); };
 	
 	
 	pluginProto.exps = new Exps();
