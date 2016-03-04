@@ -1,13 +1,13 @@
-﻿function GetPluginSettings()
+function GetPluginSettings()
 {
 	return {
 		"name":			"REST",					// as appears in 'insert object' dialog, can be changed as long as "id" stays the same
 		"id":			"AJK_REST",				// this is used to identify this plugin and is saved to the project; never change it
 		"version":		"1.0",					// (float in x.y format) Plugin version - C2 shows compatibility warnings based on this
-		"description":	"Coming soon",
+		"description":	"Coming soon - based on the native AJAX plugin.",
 		"author":		"Adam Kinson",
 		"help url":		"Coming soon",
-		"category":		"General",				// Prefer to re-use existing categories, but you can set anything here
+		"category":		"Web",				// Prefer to re-use existing categories, but you can set anything here
 		"type":			"object",				// either "world" (appears in layout and is drawn), else "object"
 		"rotatable":		false,					// only used when "type" is "world".  Enables an angle property on the object.
 		"flags":		0						// uncomment lines to enable flags...
@@ -41,10 +41,15 @@
 //				description,		// appears in event wizard dialog when selected
 //				script_name);		// corresponding runtime function name
 				
-// example				
-//AddNumberParam("Number", "Enter a number to test if positive.");
-// ???don't think i need any conditions????
-//AddCondition(0, cf_none, "Is number positive", "My category", "{0} is positive", "Description for my condition!", "MyCondition");
+AddStringParam("Tag", "A tag, which can be anything you like, to distinguish between different AJAX requests.", "\"\"");
+AddCondition(0,	cf_trigger, "On completed", "AJAX", "On <b>{0}</b> completed", "Triggered when an AJAX request completes successfully.", "OnComplete");
+
+AddStringParam("Tag", "A tag, which can be anything you like, to distinguish between different AJAX requests.", "\"\"");
+AddCondition(1,	cf_trigger, "On error", "AJAX", "On <b>{0}</b> error", "Triggered when an AJAX request fails.", "OnError");
+
+AddStringParam("Tag", "A tag, which can be anything you like, to distinguish between different AJAX requests.", "\"\"");
+AddCondition(2,	cf_trigger, "On progress", "AJAX", "On <b>{0}</b> progress", "Triggered when an AJAX request has a progress update.", "OnProgress");
+
 
 ////////////////////////////////////////
 // Actions
@@ -58,10 +63,34 @@
 //			 script_name);		// corresponding runtime function name
 
 // example
+AddStringParam("Tag", "A tag, which can be anything you like, to distinguish between different AJAX requests.", "\"\"");
+AddStringParam("URL", "The URL to request.  Note: most browsers prevent cross-domain requests.", "\"http://\"");
+AddAction(0, 0, "Request URL", "AJAX", "Request <b>{1}</b> (tag <i>{0}</i>)", "Request a URL by a GET request and retrieve the server response.", "Request");
+
+AddStringParam("Tag", "A tag, which can be anything you like, to distinguish between different AJAX requests.", "\"\"");
+AddFileParam("File", "Select a project file to request.");
+AddAction(1, 0, "Request project file", "AJAX", "Request <b>{1}</b> (tag <i>{0}</i>)", "Request a file in the project and retrieve its contents.", "RequestFile");
+
+AddStringParam("Tag", "A tag, which can be anything you like, to distinguish between different AJAX requests.", "\"\"");
+AddStringParam("URL", "The URL to post to.  Note: most browsers prevent cross-domain posts.", "\"http://\"");
+AddStringParam("Data", "The data to post, in query string form.  Be sure to URLEncode any user-entered data.");
+AddStringParam("Method", "The HTTP method to use, typically \"POST\".", "\"POST\"");
+AddAction(2, 0, "Post to URL", "AJAX", "Send <b>{2}</b> to URL <b>{1}</b> (method <i>{3}</i>, tag <i>{0}</i>)", "Send data with a request to a URL and retrieve the server response.", "Post");
+
+AddNumberParam("Timeout", "The timeout for AJAX requests in seconds. Use -1 for no timeout.");
+AddAction(3, 0, "Set timeout", "AJAX", "Set timeout to <i>{0}</i> seconds", "Set the maximum time before a request is considered to have failed.", "SetTimeout");
+
+AddStringParam("Header", "The HTTP header name to set on the request.");
+AddStringParam("Value", "A string of the value to set the header to.");
+AddAction(4, 0, "Set request header", "AJAX", "Set request header <i>{0}</i> to <i>{1}</i>", "Set a HTTP header on the next request that is made.", "SetHeader");
+
+AddStringParam("MIME type", "The MIME type to interpret the response as.");
+AddAction(5, 0, "Override MIME type", "AJAX", "Override MIME type with <b>{0}</b>", "In the next request, override the MIME type indicated by the response.", "OverrideMIMEType");
 
 
-AddStringParam("Resource Name", "Enter the name of the RESTful resource (e.g.'account', 'user', etc.)");
-AddAction(0, af_none, "Create resource (POST)", "API Calls", "Create a new {0}", "Sends a POST request to the server to create a new resource.", "Create");
+//AddStringParam("Resource Name", "Enter the name of the RESTful resource (e.g.'account', 'user', etc.)");
+//AddStringParam("Data", "Enter the data to be sent with the request.");
+//AddAction(0, af_none, "Create resource (POST)", "API Calls", "Create a new {0}", "Sends a POST request to the server to create a new resource.", "Create");
 
 
 ////////////////////////////////////////
@@ -76,10 +105,13 @@ AddAction(0, af_none, "Create resource (POST)", "API Calls", "Create a new {0}",
 //				 description);	// description in expressions panel
 
 // example
-AddExpression(0, ef_return_number, "Resource ID", "API Data", "getResourceID", "Returns the database ID of this resource.");
-AddExpression(1, ef_return_string, "Resource Name", "API Data", "getResourceName", "Returns the name of this resource.");
-AddExpression(2, ef_return_string, "Resource JSON", "API Data", "getResourceJSON", "Returns the full JSON response for this resource.");
+//AddExpression(0, ef_return_number, "Resource ID", "API Data", "getResourceID", "Returns the database ID of this resource.");
+//AddExpression(1, ef_return_string, "Resource Name", "API Data", "getResourceName", "Returns the name of this resource.");
+//AddExpression(2, ef_return_string, "Resource JSON", "API Data", "getResourceJSON", "Returns the full JSON response for this resource.");
 
+AddExpression(0, ef_return_string, "Get last data", "AJAX", "LastData", "Get the data returned by the last successful request.");
+AddExpression(1, ef_return_number, "Get progress", "AJAX", "Progress", "Get the progress, from 0 to 1, of the request in 'On progress'.");
+AddExpression(2, ef_return_string, "Get response headers", "AJAX", "ResponseHeaders", "Get the headers returned by the last successful request.");
 
 
 
@@ -97,7 +129,9 @@ ACESDone();
 // new cr.Property(ept_link,		name,	link_text,		description, "firstonly")		// has no associated value; simply calls "OnPropertyChanged" on click
 
 var property_list = [
-	new cr.Property(ept_integer, 	"My property",		77,		"An example property.")
+	//new cr.Property(ept_text, "Base URI", "https://yoursite.com", "The base URI for your RESTful server.")
+	//new cr.Property(ept_text, "File Type", "application/json", "The file type that's expected by the server (e.g., application/json).")
+	//new cr.Property(ept_text, "API token", "", "The user's API token for the server, saved after authentication)
 	];
 	
 // Called by IDE when a new object type is to be created
