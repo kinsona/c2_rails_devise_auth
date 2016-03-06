@@ -1,16 +1,16 @@
 function GetPluginSettings()
 {
 	return {
-		"name":			"REST",					// as appears in 'insert object' dialog, can be changed as long as "id" stays the same
-		"id":			"AJK_REST",				// this is used to identify this plugin and is saved to the project; never change it
+		"name":			"Rails Devise Authentication",					// as appears in 'insert object' dialog, can be changed as long as "id" stays the same
+		"id":			"Rails_Devise_Auth",				// this is used to identify this plugin and is saved to the project; never change it
 		"version":		"1.0",					// (float in x.y format) Plugin version - C2 shows compatibility warnings based on this
 		"description":	"Coming soon - based on the native AJAX plugin.",
 		"author":		"Adam Kinson",
 		"help url":		"Coming soon",
-		"category":		"Web",				// Prefer to re-use existing categories, but you can set anything here
+		"category":		"Web",					// Prefer to re-use existing categories, but you can set anything here
 		"type":			"object",				// either "world" (appears in layout and is drawn), else "object"
-		"rotatable":		false,					// only used when "type" is "world".  Enables an angle property on the object.
-		"flags":		0						// uncomment lines to enable flags...
+		"rotatable":		false,				// only used when "type" is "world".  Enables an angle property on the object.
+		"flags":		pf_singleglobal			// uncomment lines to enable flags...
 	};
 };
 
@@ -42,13 +42,13 @@ function GetPluginSettings()
 //				script_name);		// corresponding runtime function name
 				
 AddStringParam("Tag", "A tag, which can be anything you like, to distinguish between different AJAX requests.", "\"\"");
-AddCondition(0,	cf_trigger, "On completed", "REST", "On <b>{0}</b> completed", "Triggered when an AJAX request completes successfully.", "OnComplete");
+AddCondition(0,	cf_trigger, "On completed", "Rails Devise Auth", "On <b>{0}</b> completed", "Triggered when an AJAX request completes successfully.", "OnComplete");
 
 AddStringParam("Tag", "A tag, which can be anything you like, to distinguish between different AJAX requests.", "\"\"");
-AddCondition(1,	cf_trigger, "On error", "REST", "On <b>{0}</b> error", "Triggered when an AJAX request fails.", "OnError");
+AddCondition(1,	cf_trigger, "On error", "Rails Devise Auth", "On <b>{0}</b> error", "Triggered when an AJAX request fails.", "OnError");
 
 AddStringParam("Tag", "A tag, which can be anything you like, to distinguish between different AJAX requests.", "\"\"");
-AddCondition(2,	cf_trigger, "On progress", "REST", "On <b>{0}</b> progress", "Triggered when an AJAX request has a progress update.", "OnProgress");
+AddCondition(2,	cf_trigger, "On progress", "Rails Devise Auth", "On <b>{0}</b> progress", "Triggered when an AJAX request has a progress update.", "OnProgress");
 
 
 ////////////////////////////////////////
@@ -65,27 +65,27 @@ AddCondition(2,	cf_trigger, "On progress", "REST", "On <b>{0}</b> progress", "Tr
 // example
 AddStringParam("Tag", "A tag, which can be anything you like, to distinguish between different AJAX requests.", "\"\"");
 AddStringParam("URL", "The URL to request.  Note: most browsers prevent cross-domain requests.", "\"http://\"");
-AddAction(0, 0, "Request URL", "AJAX", "Request <b>{1}</b> (tag <i>{0}</i>)", "Request a URL by a GET request and retrieve the server response.", "Request");
+AddAction(0, 0, "Request URL", "Rails Devise Auth", "Request <b>{1}</b> (tag <i>{0}</i>)", "Request a URL by a GET request and retrieve the server response.", "Request");
 
 AddStringParam("Tag", "A tag, which can be anything you like, to distinguish between different AJAX requests.", "\"\"");
 AddFileParam("File", "Select a project file to request.");
-AddAction(1, 0, "Request project file", "AJAX", "Request <b>{1}</b> (tag <i>{0}</i>)", "Request a file in the project and retrieve its contents.", "RequestFile");
+AddAction(1, 0, "Request project file", "Rails Devise Auth", "Request <b>{1}</b> (tag <i>{0}</i>)", "Request a file in the project and retrieve its contents.", "RequestFile");
 
 AddStringParam("Tag", "A tag, which can be anything you like, to distinguish between different AJAX requests.", "\"\"");
 AddStringParam("URL", "The URL to post to.  Note: most browsers prevent cross-domain posts.", "\"http://\"");
 AddStringParam("Data", "The data to post, in query string form.  Be sure to URLEncode any user-entered data.");
 AddStringParam("Method", "The HTTP method to use, typically \"POST\".", "\"POST\"");
-AddAction(2, 0, "Post to URL", "AJAX", "Send <b>{2}</b> to URL <b>{1}</b> (method <i>{3}</i>, tag <i>{0}</i>)", "Send data with a request to a URL and retrieve the server response.", "Post");
+AddAction(2, 0, "Post to URL", "Rails Devise Auth", "Send <b>{2}</b> to URL <b>{1}</b> (method <i>{3}</i>, tag <i>{0}</i>)", "Send data with a request to a URL and retrieve the server response.", "Post");
 
 AddNumberParam("Timeout", "The timeout for AJAX requests in seconds. Use -1 for no timeout.");
-AddAction(3, 0, "Set timeout", "AJAX", "Set timeout to <i>{0}</i> seconds", "Set the maximum time before a request is considered to have failed.", "SetTimeout");
+AddAction(3, 0, "Set timeout", "Rails Devise Auth", "Set timeout to <i>{0}</i> seconds", "Set the maximum time before a request is considered to have failed.", "SetTimeout");
 
 AddStringParam("Header", "The HTTP header name to set on the request.");
 AddStringParam("Value", "A string of the value to set the header to.");
-AddAction(4, 0, "Set request header", "AJAX", "Set request header <i>{0}</i> to <i>{1}</i>", "Set a HTTP header on the next request that is made.", "SetHeader");
+AddAction(4, 0, "Set request header", "Rails Devise Auth", "Set request header <i>{0}</i> to <i>{1}</i>", "Set a HTTP header on the next request that is made.", "SetHeader");
 
 AddStringParam("MIME type", "The MIME type to interpret the response as.");
-AddAction(5, 0, "Override MIME type", "AJAX", "Override MIME type with <b>{0}</b>", "In the next request, override the MIME type indicated by the response.", "OverrideMIMEType");
+AddAction(5, 0, "Override MIME type", "Rails Devise Auth", "Override MIME type with <b>{0}</b>", "In the next request, override the MIME type indicated by the response.", "OverrideMIMEType");
 
 
 //AddStringParam("Resource Name", "Enter the name of the RESTful resource (e.g.'account', 'user', etc.)");
@@ -109,9 +109,13 @@ AddAction(5, 0, "Override MIME type", "AJAX", "Override MIME type with <b>{0}</b
 //AddExpression(1, ef_return_string, "Resource Name", "API Data", "getResourceName", "Returns the name of this resource.");
 //AddExpression(2, ef_return_string, "Resource JSON", "API Data", "getResourceJSON", "Returns the full JSON response for this resource.");
 
-AddExpression(0, ef_return_string, "Get last data", "REST", "LastData", "Get the data returned by the last successful request.");
-AddExpression(1, ef_return_number, "Get progress", "REST", "Progress", "Get the progress, from 0 to 1, of the request in 'On progress'.");
-AddExpression(2, ef_return_string, "Get token", "REST", "Token", "Get the API token returned by the last successful request.");
+AddExpression(0, ef_return_string, "Get last data", "Rails Devise Auth", "LastData", "Get the data returned by the last successful request.");
+AddExpression(1, ef_return_number, "Get progress", "Rails Devise Auth", "Progress", "Get the progress, from 0 to 1, of the request in 'On progress'.");
+AddExpression(2, ef_return_string, "Get token", "Rails Devise Auth", "Token", "Get the API token returned by the last successful request.");
+AddExpression(3, ef_return_string, "Get token type", "Rails Devise Auth", "TokenType", "Get the token type returned by the last successful request.");
+AddExpression(4, ef_return_string, "Get token client", "Rails Devise Auth", "Client", "Get the client identifier returned by the last successful request.");
+AddExpression(5, ef_return_string, "Get token expiry", "Rails Devise Auth", "Expiry", "Get the token expiry timestamp returned by the last successful request.");
+AddExpression(6, ef_return_string, "Get token uid", "Rails Devise Auth", "Uid", "Get the token UID returned by the last successful request.");
 
 
 

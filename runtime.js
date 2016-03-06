@@ -8,7 +8,7 @@ assert2(cr.plugins_, "cr.plugins_ not created");
 // Plugin class
 // *** CHANGE THE PLUGIN ID HERE *** - must match the "id" property in edittime.js
 //          vvvvvvvv
-cr.plugins_.AJK_REST = function(runtime)
+cr.plugins_.Rails_Devise_Auth = function(runtime)
 {
 	this.runtime = runtime;
 };
@@ -22,7 +22,7 @@ cr.plugins_.AJK_REST = function(runtime)
 	/////////////////////////////////////
 	// *** CHANGE THE PLUGIN ID HERE *** - must match the "id" property in edittime.js
 	//                            vvvvvvvv
-	var pluginProto = cr.plugins_.AJK_REST.prototype;
+	var pluginProto = cr.plugins_.Rails_Devise_Auth.prototype;
 		
 	/////////////////////////////////////
 	// Object type class
@@ -33,11 +33,6 @@ cr.plugins_.AJK_REST = function(runtime)
 	};
 
 	var typeProto = pluginProto.Type.prototype;
-	//var restRuntime = null;
-	//var restInst = null;
-	//var ResourceID = null;
-	//var ResourceName = "";
-	//var ResourceJSON = "";
 
 	// called on startup for each object type
 	typeProto.onCreate = function()
@@ -55,6 +50,10 @@ cr.plugins_.AJK_REST = function(runtime)
 		// this.myValue = 0;
 		this.lastData = "";
 		this.token = "";
+		this.tokenType = "";
+		this.client = "";
+		this.expiry = "";
+		this.uid = "";
 		this.curTag = "";
 		this.progress = 0;
 		this.timeout = -1;
@@ -85,18 +84,18 @@ cr.plugins_.AJK_REST = function(runtime)
 			theInstance.curTag = tag_;
 			theInstance.lastData = param_;
 			theInstance.token = "DC ISSUE";
-			theInstance.runtime.trigger(cr.plugins_.AJK_REST.prototype.cnds.OnComplete, theInstance);
+			theInstance.runtime.trigger(cr.plugins_.Rails_Devise_Auth.prototype.cnds.OnComplete, theInstance);
 		}
 		else if (event_ === "error")
 		{
 			theInstance.curTag = tag_;
-			theInstance.runtime.trigger(cr.plugins_.AJK_REST.prototype.cnds.OnError, theInstance);
+			theInstance.runtime.trigger(cr.plugins_.Rails_Devise_Auth.prototype.cnds.OnError, theInstance);
 		}
 		else if (event_ === "progress")
 		{
 			theInstance.progress = param_;
 			theInstance.curTag = tag_;
-			theInstance.runtime.trigger(cr.plugins_.AJK_REST.prototype.cnds.OnProgress, theInstance);
+			theInstance.runtime.trigger(cr.plugins_.Rails_Devise_Auth.prototype.cnds.OnProgress, theInstance);
 		}
 	};
 
@@ -116,13 +115,17 @@ cr.plugins_.AJK_REST = function(runtime)
 
 	instanceProto.saveToJSON = function ()
 	{
-		return { "lastData": this.lastData, "token": this.token };
+		return { "lastData": this.lastData, "token": this.token, "tokenType": this.tokenType, "client": this.client, "expiry": this.expiry, "uid": this.uid };
 	};
 	
 	instanceProto.loadFromJSON = function (o)
 	{
 		this.lastData = o["lastData"];
 		this.token = o["token"];
+		this.tokenType = o["tokenType"];
+		this.client = o["client"];
+		this.expiry = o["expiry"];
+		this.uid = o["uid"];
 		this.curTag = "";
 		this.progress = 0;
 	};
@@ -147,7 +150,7 @@ cr.plugins_.AJK_REST = function(runtime)
 		var doErrorFunc = function ()
 		{
 			self.curTag = tag_;
-			self.runtime.trigger(cr.plugins_.AJK_REST.prototype.cnds.OnError, self);
+			self.runtime.trigger(cr.plugins_.Rails_Devise_Auth.prototype.cnds.OnError, self);
 		};
 		
 		var errorFunc = function ()
@@ -168,7 +171,7 @@ cr.plugins_.AJK_REST = function(runtime)
 						
 						self.lastData = data.replace(/\r\n/g, "\n");
 						self.token = "errorFunc issue";
-						self.runtime.trigger(cr.plugins_.AJK_REST.prototype.cnds.OnComplete, self);
+						self.runtime.trigger(cr.plugins_.Rails_Devise_Auth.prototype.cnds.OnComplete, self);
 					});
 				}
 				else
@@ -185,7 +188,7 @@ cr.plugins_.AJK_REST = function(runtime)
 				
 			self.progress = e.loaded / e.total;
 			self.curTag = tag_;
-			self.runtime.trigger(cr.plugins_.AJK_REST.prototype.cnds.OnProgress, self);
+			self.runtime.trigger(cr.plugins_.Rails_Devise_Auth.prototype.cnds.OnProgress, self);
 		};
 			
 		try
@@ -206,21 +209,30 @@ cr.plugins_.AJK_REST = function(runtime)
 					if (request.responseText) {
 						self.lastData = request.responseText.replace(/\r\n/g, "\n");		// fix windows style line endings
 						self.token = request.getResponseHeader("Access-Token");
+						self.tokenType = request.getResponseHeader("Token-Type");
+						self.client = request.getResponseHeader("Client");
+						self.expiry = request.getResponseHeader("Expiry");
+						self.uid = request.getResponseHeader("Uid");
 					}
 					else {
 						self.lastData = "";
 						self.token = "";
+						self.tokenType = "";
+						self.client = "";
+						self.expiry = "";
+						self.uid = "";
 					}
 					
 					if (request.status >= 400)
-						self.runtime.trigger(cr.plugins_.AJK_REST.prototype.cnds.OnError, self);
+						self.runtime.trigger(cr.plugins_.Rails_Devise_Auth.prototype.cnds.OnError, self);
 					else
 					{
 						// In node-webkit, don't trigger 'on success' with empty string if file not found.
 						// In a browser also don't trigger 'on success' if the returned string is empty and the status is 0,
 						// which is what happens when onerror is about to fire.
 						if ((!isNWjs || self.lastData.length) && !(!isNWjs && request.status === 0 && !self.lastData.length))
-							self.runtime.trigger(cr.plugins_.AJK_REST.prototype.cnds.OnComplete, self);
+							console.log(self);
+							self.runtime.trigger(cr.plugins_.Rails_Devise_Auth.prototype.cnds.OnComplete, self);
 					}
 				}
 			};
@@ -302,10 +314,14 @@ cr.plugins_.AJK_REST = function(runtime)
 	instanceProto.getDebuggerValues = function (propsections)
 	{
 		propsections.push({
-			"title": "REST",
+			"title": "Auth Token",
 			"properties": [
 				{"name": "Last data", "value": this.lastData, "readonly": true},
-				{"name": "Token", "value": this.token, "readonly": true}
+				{"name": "Token", "value": this.token, "readonly": true},
+				{"name": "Token Type", "value": this.tokenType, "readonly": true},
+				{"name": "Client", "value": this.client, "readonly": true},
+				{"name": "Expiry", "value": this.expiry, "readonly": true},
+				{"name": "Uid", "value": this.uid, "readonly": true}
 			]
 		});
 	};
@@ -417,7 +433,26 @@ cr.plugins_.AJK_REST = function(runtime)
 	{
 		ret.set_string(this.token);
 	};
-		
+
+	Exps.prototype.TokenType = function (ret)
+	{
+		ret.set_string(this.tokenType);
+	};
+
+	Exps.prototype.Client = function (ret)
+	{
+		ret.set_string(this.client);
+	};
+
+	Exps.prototype.Expiry = function (ret)
+	{
+		ret.set_string(this.expiry);
+	};
+
+	Exps.prototype.Uid = function (ret)
+	{
+		ret.set_string(this.uid);
+	};		
 	// 'ret' must always be the first parameter - always return the expression's result through it!
 	//Exps.prototype.getResourceID = function (ret)	{ ret.set_int(ResourceID); };
 	//Exps.prototype.getResourceName = function (ret)	{ ret.set_string(ResourceName); };
