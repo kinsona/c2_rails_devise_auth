@@ -1,2 +1,2 @@
-# ajk_rest
-Plugin for Construct 2 for easier handling of RESTful resources
+# c2_rails_devise_auth
+Construct 2 plugin for authentication using Rails and Devise
