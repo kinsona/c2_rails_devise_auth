@@ -115,7 +115,7 @@ AddExpression(2, ef_return_string, "Get token", "Rails Devise Auth", "Token", "G
 AddExpression(3, ef_return_string, "Get token type", "Rails Devise Auth", "TokenType", "Get the token type returned by the last successful request.");
 AddExpression(4, ef_return_string, "Get token client", "Rails Devise Auth", "Client", "Get the client identifier returned by the last successful request.");
 AddExpression(5, ef_return_string, "Get token expiry", "Rails Devise Auth", "Expiry", "Get the token expiry timestamp returned by the last successful request.");
-AddExpression(6, ef_return_string, "Get token uid", "Rails Devise Auth", "Uid", "Get the token UID returned by the last successful request.");
+AddExpression(6, ef_return_string, "Get token uid", "Rails Devise Auth", "TokenUid", "Get the token UID returned by the last successful request.");
 
 
 

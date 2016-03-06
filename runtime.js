@@ -53,7 +53,7 @@ cr.plugins_.Rails_Devise_Auth = function(runtime)
 		this.tokenType = "";
 		this.client = "";
 		this.expiry = "";
-		this.uid = "";
+		this.tokenUid = "";
 		this.curTag = "";
 		this.progress = 0;
 		this.timeout = -1;
@@ -115,7 +115,7 @@ cr.plugins_.Rails_Devise_Auth = function(runtime)
 
 	instanceProto.saveToJSON = function ()
 	{
-		return { "lastData": this.lastData, "token": this.token, "tokenType": this.tokenType, "client": this.client, "expiry": this.expiry, "uid": this.uid };
+		return { "lastData": this.lastData, "token": this.token, "tokenType": this.tokenType, "client": this.client, "expiry": this.expiry, "tokenUid": this.tokenUid };
 	};
 	
 	instanceProto.loadFromJSON = function (o)
@@ -125,7 +125,7 @@ cr.plugins_.Rails_Devise_Auth = function(runtime)
 		this.tokenType = o["tokenType"];
 		this.client = o["client"];
 		this.expiry = o["expiry"];
-		this.uid = o["uid"];
+		this.tokenUid = o["tokenUid"];
 		this.curTag = "";
 		this.progress = 0;
 	};
@@ -212,7 +212,7 @@ cr.plugins_.Rails_Devise_Auth = function(runtime)
 						self.tokenType = request.getResponseHeader("Token-Type");
 						self.client = request.getResponseHeader("Client");
 						self.expiry = request.getResponseHeader("Expiry");
-						self.uid = request.getResponseHeader("Uid");
+						self.tokenUid = request.getResponseHeader("Uid");
 					}
 					else {
 						self.lastData = "";
@@ -220,7 +220,7 @@ cr.plugins_.Rails_Devise_Auth = function(runtime)
 						self.tokenType = "";
 						self.client = "";
 						self.expiry = "";
-						self.uid = "";
+						self.tokenUid = "";
 					}
 					
 					if (request.status >= 400)
@@ -321,7 +321,7 @@ cr.plugins_.Rails_Devise_Auth = function(runtime)
 				{"name": "Token Type", "value": this.tokenType, "readonly": true},
 				{"name": "Client", "value": this.client, "readonly": true},
 				{"name": "Expiry", "value": this.expiry, "readonly": true},
-				{"name": "Uid", "value": this.uid, "readonly": true}
+				{"name": "TokenUid", "value": this.tokenUid, "readonly": true}
 			]
 		});
 	};
@@ -449,9 +449,9 @@ cr.plugins_.Rails_Devise_Auth = function(runtime)
 		ret.set_string(this.expiry);
 	};
 
-	Exps.prototype.Uid = function (ret)
+	Exps.prototype.TokenUid = function (ret)
 	{
-		ret.set_string(this.uid);
+		ret.set_string(this.tokenUid);
 	};		
 	// 'ret' must always be the first parameter - always return the expression's result through it!
 	//Exps.prototype.getResourceID = function (ret)	{ ret.set_int(ResourceID); };
