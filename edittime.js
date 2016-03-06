@@ -42,13 +42,13 @@ function GetPluginSettings()
 //				script_name);		// corresponding runtime function name
 				
 AddStringParam("Tag", "A tag, which can be anything you like, to distinguish between different AJAX requests.", "\"\"");
-AddCondition(0,	cf_trigger, "On completed", "AJAX", "On <b>{0}</b> completed", "Triggered when an AJAX request completes successfully.", "OnComplete");
+AddCondition(0,	cf_trigger, "On completed", "REST", "On <b>{0}</b> completed", "Triggered when an AJAX request completes successfully.", "OnComplete");
 
 AddStringParam("Tag", "A tag, which can be anything you like, to distinguish between different AJAX requests.", "\"\"");
-AddCondition(1,	cf_trigger, "On error", "AJAX", "On <b>{0}</b> error", "Triggered when an AJAX request fails.", "OnError");
+AddCondition(1,	cf_trigger, "On error", "REST", "On <b>{0}</b> error", "Triggered when an AJAX request fails.", "OnError");
 
 AddStringParam("Tag", "A tag, which can be anything you like, to distinguish between different AJAX requests.", "\"\"");
-AddCondition(2,	cf_trigger, "On progress", "AJAX", "On <b>{0}</b> progress", "Triggered when an AJAX request has a progress update.", "OnProgress");
+AddCondition(2,	cf_trigger, "On progress", "REST", "On <b>{0}</b> progress", "Triggered when an AJAX request has a progress update.", "OnProgress");
 
 
 ////////////////////////////////////////
@@ -109,9 +109,9 @@ AddAction(5, 0, "Override MIME type", "AJAX", "Override MIME type with <b>{0}</b
 //AddExpression(1, ef_return_string, "Resource Name", "API Data", "getResourceName", "Returns the name of this resource.");
 //AddExpression(2, ef_return_string, "Resource JSON", "API Data", "getResourceJSON", "Returns the full JSON response for this resource.");
 
-AddExpression(0, ef_return_string, "Get last data", "AJAX", "LastData", "Get the data returned by the last successful request.");
-AddExpression(1, ef_return_number, "Get progress", "AJAX", "Progress", "Get the progress, from 0 to 1, of the request in 'On progress'.");
-AddExpression(2, ef_return_string, "Get response headers", "AJAX", "ResponseHeaders", "Get the headers returned by the last successful request.");
+AddExpression(0, ef_return_string, "Get last data", "REST", "LastData", "Get the data returned by the last successful request.");
+AddExpression(1, ef_return_number, "Get progress", "REST", "Progress", "Get the progress, from 0 to 1, of the request in 'On progress'.");
+AddExpression(2, ef_return_string, "Get token", "REST", "Token", "Get the API token returned by the last successful request.");
 
 
 

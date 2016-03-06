@@ -54,7 +54,7 @@ cr.plugins_.AJK_REST = function(runtime)
 		// any other properties you need, e.g...
 		// this.myValue = 0;
 		this.lastData = "";
-		this.responseHeaders = "";
+		this.token = "";
 		this.curTag = "";
 		this.progress = 0;
 		this.timeout = -1;
@@ -84,18 +84,19 @@ cr.plugins_.AJK_REST = function(runtime)
 		{
 			theInstance.curTag = tag_;
 			theInstance.lastData = param_;
-			theInstance.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnComplete, theInstance);
+			theInstance.token = "DC ISSUE";
+			theInstance.runtime.trigger(cr.plugins_.AJK_REST.prototype.cnds.OnComplete, theInstance);
 		}
 		else if (event_ === "error")
 		{
 			theInstance.curTag = tag_;
-			theInstance.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnError, theInstance);
+			theInstance.runtime.trigger(cr.plugins_.AJK_REST.prototype.cnds.OnError, theInstance);
 		}
 		else if (event_ === "progress")
 		{
 			theInstance.progress = param_;
 			theInstance.curTag = tag_;
-			theInstance.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnProgress, theInstance);
+			theInstance.runtime.trigger(cr.plugins_.AJK_REST.prototype.cnds.OnProgress, theInstance);
 		}
 	};
 
@@ -115,12 +116,13 @@ cr.plugins_.AJK_REST = function(runtime)
 
 	instanceProto.saveToJSON = function ()
 	{
-		return { "lastData": this.lastData };
+		return { "lastData": this.lastData, "token": this.token };
 	};
 	
 	instanceProto.loadFromJSON = function (o)
 	{
 		this.lastData = o["lastData"];
+		this.token = o["token"];
 		this.curTag = "";
 		this.progress = 0;
 	};
@@ -128,6 +130,7 @@ cr.plugins_.AJK_REST = function(runtime)
 	var next_request_headers = {};
 	var next_override_mime = "";
 	
+
 	instanceProto.doRequest = function (tag_, url_, method_, data_)
 	{
 		// In directCanvas: forward request to webview layer
@@ -144,7 +147,7 @@ cr.plugins_.AJK_REST = function(runtime)
 		var doErrorFunc = function ()
 		{
 			self.curTag = tag_;
-			self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnError, self);
+			self.runtime.trigger(cr.plugins_.AJK_REST.prototype.cnds.OnError, self);
 		};
 		
 		var errorFunc = function ()
@@ -163,8 +166,9 @@ cr.plugins_.AJK_REST = function(runtime)
 							return;
 						}
 						
-						self.lastData = data.replace(/\r\n/g, "\n")
-						self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnComplete, self);
+						self.lastData = data.replace(/\r\n/g, "\n");
+						self.token = "errorFunc issue";
+						self.runtime.trigger(cr.plugins_.AJK_REST.prototype.cnds.OnComplete, self);
 					});
 				}
 				else
@@ -181,7 +185,7 @@ cr.plugins_.AJK_REST = function(runtime)
 				
 			self.progress = e.loaded / e.total;
 			self.curTag = tag_;
-			self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnProgress, self);
+			self.runtime.trigger(cr.plugins_.AJK_REST.prototype.cnds.OnProgress, self);
 		};
 			
 		try
@@ -201,23 +205,22 @@ cr.plugins_.AJK_REST = function(runtime)
 					
 					if (request.responseText) {
 						self.lastData = request.responseText.replace(/\r\n/g, "\n");		// fix windows style line endings
-						console.log(request.getAllResponseHeaders());
-						console.log(request);
-						self.responseHeaders = request.getAllResponseHeaders();
+						self.token = request.getResponseHeader("Access-Token");
 					}
-					else
+					else {
 						self.lastData = "";
-						self.responseHeaders = "";
+						self.token = "";
+					}
 					
 					if (request.status >= 400)
-						self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnError, self);
+						self.runtime.trigger(cr.plugins_.AJK_REST.prototype.cnds.OnError, self);
 					else
 					{
 						// In node-webkit, don't trigger 'on success' with empty string if file not found.
 						// In a browser also don't trigger 'on success' if the returned string is empty and the status is 0,
 						// which is what happens when onerror is about to fire.
 						if ((!isNWjs || self.lastData.length) && !(!isNWjs && request.status === 0 && !self.lastData.length))
-							self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnComplete, self);
+							self.runtime.trigger(cr.plugins_.AJK_REST.prototype.cnds.OnComplete, self);
 					}
 				}
 			};
@@ -302,7 +305,7 @@ cr.plugins_.AJK_REST = function(runtime)
 			"title": "REST",
 			"properties": [
 				{"name": "Last data", "value": this.lastData, "readonly": true},
-				{"name": "Response headers", "value": this.responseHeaders, "readonly": true}
+				{"name": "Token", "value": this.token, "readonly": true}
 			]
 		});
 	};
@@ -410,9 +413,9 @@ cr.plugins_.AJK_REST = function(runtime)
 		ret.set_float(this.progress);
 	};
 
-	Exps.prototype.ResponseHeaders = function (ret)
+	Exps.prototype.Token = function (ret)
 	{
-		ret.set_string(this.responseHeaders);
+		ret.set_string(this.token);
 	};
 		
 	// 'ret' must always be the first parameter - always return the expression's result through it!
