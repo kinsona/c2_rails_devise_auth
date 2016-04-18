@@ -54,6 +54,7 @@ cr.plugins_.Rails_Devise_Auth = function(runtime)
 		this.client = "";
 		this.expiry = "";
 		this.tokenUid = "";
+		this.resourceId = -1;
 		this.curTag = "";
 		this.progress = 0;
 		this.timeout = -1;
@@ -115,7 +116,15 @@ cr.plugins_.Rails_Devise_Auth = function(runtime)
 
 	instanceProto.saveToJSON = function ()
 	{
-		return { "lastData": this.lastData, "token": this.token, "tokenType": this.tokenType, "client": this.client, "expiry": this.expiry, "tokenUid": this.tokenUid };
+		return {
+			"lastData": this.lastData, 
+			"token": this.token, 
+			"tokenType": this.tokenType, 
+			"client": this.client, 
+			"expiry": this.expiry,
+			"tokenUid": this.tokenUid,
+			"resourceId": this.resourceId
+		};
 	};
 	
 	instanceProto.loadFromJSON = function (o)
@@ -126,6 +135,7 @@ cr.plugins_.Rails_Devise_Auth = function(runtime)
 		this.client = o["client"];
 		this.expiry = o["expiry"];
 		this.tokenUid = o["tokenUid"];
+		this.resourceId = o["resourceId"]
 		this.curTag = "";
 		this.progress = 0;
 	};
@@ -213,6 +223,8 @@ cr.plugins_.Rails_Devise_Auth = function(runtime)
 						self.client = request.getResponseHeader("Client");
 						self.expiry = request.getResponseHeader("Expiry");
 						self.tokenUid = request.getResponseHeader("Uid");
+						self.resourceId = JSON.parse(request.response).data.id;
+						console.log(request);
 					}
 					else {
 						self.lastData = "";
@@ -221,6 +233,7 @@ cr.plugins_.Rails_Devise_Auth = function(runtime)
 						self.client = "";
 						self.expiry = "";
 						self.tokenUid = "";
+						self.resourceId = -1;
 					}
 					
 					if (request.status >= 400)
@@ -231,7 +244,7 @@ cr.plugins_.Rails_Devise_Auth = function(runtime)
 						// In a browser also don't trigger 'on success' if the returned string is empty and the status is 0,
 						// which is what happens when onerror is about to fire.
 						if ((!isNWjs || self.lastData.length) && !(!isNWjs && request.status === 0 && !self.lastData.length))
-							console.log(self);
+							//console.log(self);
 							self.runtime.trigger(cr.plugins_.Rails_Devise_Auth.prototype.cnds.OnComplete, self);
 					}
 				}
@@ -321,7 +334,8 @@ cr.plugins_.Rails_Devise_Auth = function(runtime)
 				{"name": "Token Type", "value": this.tokenType, "readonly": true},
 				{"name": "Client", "value": this.client, "readonly": true},
 				{"name": "Expiry", "value": this.expiry, "readonly": true},
-				{"name": "TokenUid", "value": this.tokenUid, "readonly": true}
+				{"name": "TokenUid", "value": this.tokenUid, "readonly": true},
+				{"name": "ResourceId", "value": this.resourceId, "readonly": true}
 			]
 		});
 	};
@@ -452,7 +466,12 @@ cr.plugins_.Rails_Devise_Auth = function(runtime)
 	Exps.prototype.TokenUid = function (ret)
 	{
 		ret.set_string(this.tokenUid);
-	};		
+	};	
+
+	Exps.prototype.ResourceId = function (ret)
+	{
+		ret.set_int(this.resourceId);
+	};	
 	// 'ret' must always be the first parameter - always return the expression's result through it!
 	//Exps.prototype.getResourceID = function (ret)	{ ret.set_int(ResourceID); };
 	//Exps.prototype.getResourceName = function (ret)	{ ret.set_string(ResourceName); };
