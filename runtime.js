@@ -223,7 +223,14 @@ cr.plugins_.Rails_Devise_Auth = function(runtime)
 						self.client = request.getResponseHeader("Client");
 						self.expiry = request.getResponseHeader("Expiry");
 						self.tokenUid = request.getResponseHeader("Uid");
-						self.resourceId = JSON.parse(request.response).data.id;
+						
+						var response_data = JSON.parse(request.response).data
+						if (response_data) {
+							self.resourceId = response_data.id;
+						} else {
+							self.resorceId = -1
+						};
+
 						console.log(request);
 					}
 					else {
